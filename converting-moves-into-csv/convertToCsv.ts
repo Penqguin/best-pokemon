@@ -35,6 +35,16 @@ const allBoostKeys = Array.from(
   )
 );
 
+const allSelfKeys = Array.from(
+  new Set(
+    moves.flatMap((move: any) =>
+      move.secondary && move.secondary.self && move.secondary.self.boosts
+        ? Object.keys(move.secondary.self.boosts)
+        : []
+    )
+  )
+);
+
 // 2. Build the CSV header
 const header = [
   { id: "num", title: "Move Number" },
@@ -55,10 +65,13 @@ const header = [
     id: `secondary_${key}`,
     title: `Secondary: ${key}`,
   })),
-
   ...allBoostKeys.map((key) => ({
     id: `boost_${key}`,
     title: `Boost: ${key}`,
+  })),
+  ...allSelfKeys.map((key) => ({
+    id: `self_${key}`,
+    title: `selfBoost:${key}`,
   })),
 ];
 
@@ -93,6 +106,16 @@ const records = Object.entries(Moves).map(([key, value]: [string, any]) => {
       value.secondary.boosts &&
       value.secondary.boosts[boostKey] !== undefined
         ? value.secondary.boosts[boostKey]
+        : "";
+  });
+
+  allSelfKeys.forEach((selfKey) => {
+    record[`self_${selfKey}`] =
+      value.secondary &&
+      value.secondary.self &&
+      value.secondary.self.boosts &&
+      value.secondary.self.boosts[selfKey] !== undefined
+        ? value.secondary.self.boosts[selfKey]
         : "";
   });
   return record;
